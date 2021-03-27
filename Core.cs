@@ -12,6 +12,8 @@ namespace Game
     {
 
         private static Core _instance = null;
+        public static readonly string programStartTime = DateTime.Now.ToFileTime().ToString();
+        public static bool isRunning = true;
 
         public static Core GetInstance()
         {
@@ -30,7 +32,7 @@ namespace Game
             }
             else
             {
-                LogHandler.GetInstance().Log("There was an error whilst initializing the LogHandler.", LogType.ERROR);
+                this.Error("There was an error whilst initializing the LogHandler.");
             }
 
             if (ConfigHandler.GetInstance().Initialize())
@@ -39,13 +41,26 @@ namespace Game
             }
             else
             {
-                LogHandler.GetInstance().Log("There was an error whilst initializing the ConfigHandler.", LogType.ERROR);
+                this.Error("There was an error whilst initializing the ConfigHandler.");
             }
+
+            if (DatabaseHandler.GetInstance().Initialize())
+            {
+                LogHandler.GetInstance().Log("DatabaseHandler has initialized", LogType.SUCCESS);
+            }
+        }
+
+        public void Error(string message)
+        {
+            LogHandler.GetInstance().Log(message, LogType.ERROR);
+            this.Shutdown();
         }
 
         public void Shutdown()
         {
             // Shutdown procedures happen here - tcp close, database end, etc
+            DatabaseHandler.GetInstance().Shutdown();
+            Core.isRunning = false;
         }
 
     }

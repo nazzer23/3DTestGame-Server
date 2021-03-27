@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,8 +27,13 @@ namespace Game.Handlers
             Console.BackgroundColor = ConsoleColor.Black;
             switch (type)
             {
+                case LogType.INFO:
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    break;
                 case LogType.DEBUG:
                     // Disable if not in debug mode
+                    if (!ConfigHandler.GetInstance().GetBool("debugMode"))
+                        return;
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     break;
                 case LogType.SUCCESS:
@@ -48,6 +54,26 @@ namespace Game.Handlers
             Console.ForegroundColor = ConsoleColor.Gray;
             const string outputFormat = "[{0}] {1}";
             Console.WriteLine(outputFormat, DateTime.Now, message);
+
+            LogToFile("[{0}] [{1}] {2}", type, DateTime.Now, message);
+        }
+
+        private static void LogToFile(string format, params object[] a)
+        {
+            string logFile = "logs/log-" + Core.programStartTime + ".txt";
+            if (!Directory.Exists(@"logs"))
+            {
+                Directory.CreateDirectory(@"logs");
+            }
+
+            if (!File.Exists(logFile))
+            {
+                File.CreateText(logFile).Close();
+            }
+
+            var streamWriter = new StreamWriter(logFile, true);
+            streamWriter.WriteLine(format, a);
+            streamWriter.Close();
         }
     }
 
@@ -56,6 +82,7 @@ namespace Game.Handlers
         DEBUG,
         SUCCESS,
         WARNING,
-        ERROR
+        ERROR,
+        INFO
     }
 }

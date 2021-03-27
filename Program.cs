@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Game
 {
@@ -8,9 +9,8 @@ namespace Game
         {
             Core.GetInstance().Init();
 
-            while(Console.ReadKey().Key != ConsoleKey.Escape) { }
-
-            Core.GetInstance().Shutdown();
+            while(Core.isRunning) { }
+            Thread.Sleep(2000);
         }
     }
 }
