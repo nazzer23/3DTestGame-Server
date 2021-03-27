@@ -52,6 +52,51 @@ namespace Game.Handlers
                 return false;
             }
         }
-        
+
+        public string GetString(string key)
+        {
+            try
+            {
+                if (this._configValues.ContainsKey(key.ToLower()))
+                {
+                    return (string) _configValues[key.ToLower()];
+                }
+
+                throw new NullReferenceException();
+            } catch(Exception e)
+            {
+                LogHandler.GetInstance().Log("ConfigHandler GetString Exception [" + key.ToLower() + "] - " + e.Message, LogType.WARNING);
+            }
+
+            return "";
+        }
+
+        public int GetInt(string key)
+        {
+            try
+            {
+                return int.Parse(this.GetString(key));
+            }
+            catch (Exception e)
+            {
+                LogHandler.GetInstance().Log("ConfigHandler GetInt Exception [" + key.ToLower() + "] - " + e.Message, LogType.WARNING);
+            }
+
+            return 0;
+        }
+
+        public bool GetBool(string key)
+        {
+            try
+            {
+                return bool.Parse(this.GetString(key));
+            }
+            catch (Exception e)
+            {
+                LogHandler.GetInstance().Log("ConfigHandler GetBool Exception [" + key.ToLower() + "] - " + e.Message, LogType.WARNING);
+            }
+
+            return false;
+        }
     }
 }
