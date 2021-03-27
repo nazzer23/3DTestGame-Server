@@ -50,8 +50,6 @@ namespace Game.Handlers
                 return false;
             }
             
-            
-
             return true;
         }
 
@@ -153,7 +151,6 @@ namespace Game.Handlers
 
             LogHandler.GetInstance().Log("DatabaseHandler has been shutdown", LogType.SUCCESS);
         }
-
 
         public DataTable Fetch(string query)
         {
