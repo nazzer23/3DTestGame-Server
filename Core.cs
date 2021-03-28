@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace Game
         private static Core _instance = null;
         public static readonly string programStartTime = DateTime.Now.ToFileTime().ToString();
         public static bool isRunning = true;
+        private TcpListener socketTcpListener = null;
 
         public static Core GetInstance()
         {
@@ -48,6 +50,12 @@ namespace Game
             {
                 LogHandler.GetInstance().Log("DatabaseHandler has initialized", LogType.SUCCESS);
             }
+            else
+            {
+                this.Error("There was an error whilst initializing the DatabaseHandler");
+            }
+
+
         }
 
         public void Error(string message)

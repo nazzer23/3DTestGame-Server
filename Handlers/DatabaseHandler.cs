@@ -35,6 +35,11 @@ namespace Game.Handlers
                 return false;
             }
 
+            if (!new DatabaseTest("SELECT * FROM items").ExecuteTest())
+            {
+                return false;
+            }
+
             if (!new DatabaseTest("SELECT * FROM servers").ExecuteTest())
             {
                 return false;
@@ -49,7 +54,12 @@ namespace Game.Handlers
             {
                 return false;
             }
-            
+
+            if (!new DatabaseTest("SELECT * FROM users_items").ExecuteTest())
+            {
+                return false;
+            }
+
             return true;
         }
 
