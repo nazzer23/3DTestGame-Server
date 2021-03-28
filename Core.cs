@@ -11,7 +11,6 @@ namespace Game
 {
     public class Core
     {
-
         private static Core _instance = null;
         public static readonly string programStartTime = DateTime.Now.ToFileTime().ToString();
         public static bool isRunning = true;
@@ -23,6 +22,7 @@ namespace Game
             {
                 _instance = new Core();
             }
+
             return _instance;
         }
 
@@ -55,7 +55,13 @@ namespace Game
                 this.Error("There was an error whilst initializing the DatabaseHandler");
             }
 
+            if (DatabaseHandler.GetInstance().GetNumberOfRows("SELECT * FROM servers WHERE Name LIKE '" + ConfigHandler.GetInstance().GetString("serverName") + "'") <= 0)
+            {
+                this.Error("Unable to find server data for the entered server name.");
+            }
 
+            var serverPort = DatabaseHandler.GetInstance().Fetch($"SELECT * FROM servers WHERE Name LIKE '{ConfigHandler.GetInstance().GetString("serverName")}'").Rows[0]["Port"];
+            LogHandler.GetInstance().Log("Starting server on port " + serverPort, LogType.INFO);
         }
 
         public void Error(string message)
@@ -70,6 +76,5 @@ namespace Game
             DatabaseHandler.GetInstance().Shutdown();
             Core.isRunning = false;
         }
-
     }
 }
