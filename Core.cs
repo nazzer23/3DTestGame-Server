@@ -18,6 +18,8 @@ namespace Game
         private TcpListener socketTcpListener = null;
         public bool canListen = true;
 
+        public List<ClientHandler> connectedClients = new List<ClientHandler>();
+
         public static Core GetInstance()
         {
             if (_instance == null)
@@ -61,10 +63,13 @@ namespace Game
             {
                 this.Error("Unable to find server data for the entered server name.");
             }
-
-            var serverPort = DatabaseHandler.GetInstance().Fetch($"SELECT * FROM servers WHERE Name LIKE '{ConfigHandler.GetInstance().GetString("serverName")}'").Rows[0]["Port"];
-            LogHandler.GetInstance().Log("Starting server on port " + serverPort, LogType.INFO);
-            Listen((Int32)serverPort);
+            else
+            {
+                // Server can start.
+                var serverPort = DatabaseHandler.GetInstance().Fetch($"SELECT * FROM servers WHERE Name LIKE '{ConfigHandler.GetInstance().GetString("serverName")}'").Rows[0]["Port"];
+                LogHandler.GetInstance().Log("Starting server on port " + serverPort, LogType.INFO);
+                Listen((Int32)serverPort);
+            }
         }
 
         private void Listen(int port)
@@ -79,16 +84,21 @@ namespace Game
                 {
                     TcpClient client = this.socketTcpListener.AcceptTcpClient();
                     LogHandler.GetInstance().Log($"Accepting client {counter}", LogType.INFO);
-
-                    //byte[] writeBytes = Encoding.ASCII.GetBytes("OMG, MAPRIL IT WORKS");
-
-                    //NetworkStream nw = client.GetStream();
-                    //nw.Write(writeBytes, 0, writeBytes.Length);
-                    //nw.Flush();
-
+                    ClientHandler clientHandler = new ClientHandler(client);
+                    Thread clientThread = new Thread(clientHandler.Start);
+                    clientThread.Start();
+                    connectedClients.Add(clientHandler);
                     counter++;
                 }
             }
+        }
+
+        public void SendPacket(string message, ClientHandler client)
+        {
+            byte[] writeBytes = Encoding.ASCII.GetBytes(message);
+            NetworkStream nw = client.NetworkStream;
+            nw.Write(writeBytes, 0, writeBytes.Length);
+            nw.Flush();
         }
 
         public void Error(string message)
